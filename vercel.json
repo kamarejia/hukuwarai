@@ -1,8 +1,6 @@
 {
   "version": 2,
   "name": "lemon-fukuwarai",
-  "buildCommand": "echo 'Static site - no build needed'",
-  "outputDirectory": "./",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [

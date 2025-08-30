@@ -5,7 +5,6 @@
   "main": "index.html",
   "scripts": {
     "dev": "npx serve .",
-    "build": "echo 'Static site - no build needed'",
     "start": "npx serve ."
   },
   "keywords": ["fukuwarai", "game", "javascript", "lemon", "drag-drop"],

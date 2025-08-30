@@ -79,7 +79,7 @@ class LemonFukuwarai {
         const imagePromises = this.parts.map((part, index) => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                const imagePath = `レモふくわらい/${part.file}`;
+                const imagePath = `./レモふくわらい/${part.file}`;
                 
                 img.onload = () => {
                     console.log(`✓ 読み込み成功: ${imagePath} (${img.width}x${img.height})`);
@@ -89,7 +89,14 @@ class LemonFukuwarai {
                 
                 img.onerror = (error) => {
                     console.error(`✗ 読み込み失敗: ${imagePath}`, error);
-                    reject(error);
+                    // フォールバック: スラッシュなしでも試行
+                    const fallbackPath = `レモふくわらい/${part.file}`;
+                    img.src = fallbackPath;
+                    console.log(`フォールバック試行: ${fallbackPath}`);
+                    
+                    img.onerror = () => {
+                        reject(error);
+                    };
                 };
                 
                 console.log(`読み込み試行 ${index + 1}/13: ${imagePath}`);
@@ -349,7 +356,7 @@ class LemonFukuwarai {
         // 画像設定を一度だけ行う（ドラッグ開始時）
         if (!this.dragFollower.classList.contains('active')) {
             this.dragFollower.innerHTML = `
-                <img src="レモふくわらい/${part.file}" 
+                <img src="./レモふくわらい/${part.file}" 
                      alt="${part.displayName}" 
                      style="width: ${scaledWidth}px; height: ${scaledHeight}px;">
             `;

@@ -496,7 +496,28 @@ class LemonFukuwarai {
         
         // イベントリスナー
         this.saveTitleBtn.addEventListener('click', () => this.saveTitle());
+        this.saveTitleBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.saveTitle();
+        });
+        
         this.skipTitleBtn.addEventListener('click', () => this.skipTitle());
+        this.skipTitleBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.skipTitle();
+        });
+        
+        // 入力フィールドのタッチイベント
+        this.titleInput.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+        });
+        
+        this.titleInput.addEventListener('touchend', (e) => {
+            e.stopPropagation();
+            setTimeout(() => {
+                this.titleInput.focus();
+            }, 10);
+        });
         
         // Enterキーで保存
         this.titleInput.addEventListener('keypress', (e) => {
@@ -505,15 +526,19 @@ class LemonFukuwarai {
             }
         });
         
-        // タッチ対応
-        this.saveTitleBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            this.saveTitle();
+        // モーダル背景のクリックを無効化
+        this.titleModal.addEventListener('click', (e) => {
+            if (e.target === this.titleModal) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
         });
         
-        this.skipTitleBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            this.skipTitle();
+        this.titleModal.addEventListener('touchend', (e) => {
+            if (e.target === this.titleModal) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
         });
     }
     
@@ -525,12 +550,27 @@ class LemonFukuwarai {
         
         // モバイルでのフォーカス処理を改善
         setTimeout(() => {
-            this.titleInput.focus();
-            // iOS Safariでのフォーカス問題対応
-            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-                this.titleInput.click();
+            // 複数回試行
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    this.titleInput.focus();
+                    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                        // モバイル端末では強制的にタッチイベントを発生
+                        const touchEvent = new TouchEvent('touchstart', {
+                            bubbles: true,
+                            cancelable: true,
+                            touches: [new Touch({
+                                identifier: 0,
+                                target: this.titleInput,
+                                clientX: 0,
+                                clientY: 0
+                            })]
+                        });
+                        this.titleInput.dispatchEvent(touchEvent);
+                    }
+                }, i * 50);
             }
-        }, 100);
+        }, 200);
     }
     
     hideTitleModal() {

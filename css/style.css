@@ -475,6 +475,10 @@ h1::after {
     text-align: center;
     margin-bottom: 20px;
     transition: border-color 0.3s ease;
+    touch-action: manipulation;
+    -webkit-user-select: text;
+    user-select: text;
+    pointer-events: auto;
 }
 
 #titleInput:focus {
@@ -499,6 +503,7 @@ h1::after {
         align-items: flex-start;
         justify-content: center;
         padding-top: 10vh;
+        touch-action: manipulation;
     }
     
     .modal-content {
@@ -507,6 +512,8 @@ h1::after {
         overflow-y: auto;
         width: 95%;
         max-width: 350px;
+        touch-action: manipulation;
+        pointer-events: auto;
     }
 }
 

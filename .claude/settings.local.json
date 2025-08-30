@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(mkdir:*)",
+      "Read(/Users/ajiawatabe/Library/Containers/at.EternalStorms.Yoink/Data/Documents/YoinkPromisedFiles.noIndex/yoinkFilePromiseCreationFolder915014F5-BDD8-4525-B66E-271EDB719DBE/add915014F5-BDD8-4525-B66E-271EDB719DBE/**)",
+      "Read(/Users/ajiawatabe/Library/Containers/at.EternalStorms.Yoink/Data/Documents/YoinkPromisedFiles.noIndex/yoinkFilePromiseCreationFolder8FF9837E-2134-42F6-A849-C1F0C7FCD479/add8FF9837E-2134-42F6-A849-C1F0C7FCD479/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

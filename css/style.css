@@ -1,0 +1,369 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Kosugi Maru', cursive;
+    background-image: url('../レモふくわらい/backgroundimage.JPG');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #333;
+}
+
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ヘッダー - コンパクト&スタイリッシュ */
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+h1 {
+    color: white;
+    font-size: 2.8em;
+    margin-bottom: 8px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border-radius: 2px;
+}
+
+.game-info {
+    margin-bottom: 12px;
+}
+
+.game-info p {
+    color: #1e40af;
+    font-size: 1.2em;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.8);
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    border: 2px solid rgba(59, 130, 246, 0.2);
+}
+
+.game-status {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin: 0 auto;
+    max-width: 350px;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.game-status::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.game-status p {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1em;
+    position: relative;
+    z-index: 1;
+}
+
+/* メインゲームエリア */
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    flex: 1;
+}
+
+/* サイドパーツエリア */
+.parts-side {
+    padding: 15px;
+    width: 120px;
+    min-height: 400px;
+}
+
+.parts-boxes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.part-box {
+    width: 80px;
+    height: 80px;
+    border: 3px solid #94a3b8;
+    border-radius: 12px;
+    background: white !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.part-box.revealed {
+    border-color: #3b82f6;
+    cursor: grab;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: white !important;
+}
+
+.part-box.revealed:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    border-color: #2563eb;
+}
+
+.part-box.revealed:active {
+    cursor: grabbing;
+    transform: translateY(-1px);
+}
+
+.part-box.used {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: white !important;
+    border-color: #cbd5e1;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.part-box img {
+    max-width: 70px;
+    max-height: 70px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.part-box .question-mark {
+    font-size: 28px;
+    color: #64748b;
+    font-weight: bold;
+}
+
+/* ゲームエリア */
+.game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.canvas-container {
+    position: relative;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
+    border: 3px solid #3b82f6;
+}
+
+#gameCanvas {
+    border-radius: 15px;
+    cursor: crosshair;
+    background: rgba(248, 250, 252, 0.6);
+}
+
+
+/* コントロール */
+.controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.1em;
+    font-family: 'Kosugi Maru', cursive;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(148, 163, 184, 0.3);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 2.2em;
+    }
+    
+    .game-info p {
+        font-size: 1.1em;
+    }
+    
+    .game-container {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 5px;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+    
+    .parts-side.left-side {
+        order: 1;
+        flex: 0 0 auto;
+    }
+    
+    .game-area {
+        order: 2;
+        flex: 0 0 auto;
+    }
+    
+    .parts-side.right-side {
+        order: 3;
+        flex: 0 0 auto;
+    }
+    
+    .parts-side {
+        width: 70px;
+        max-width: 70px;
+        min-height: auto;
+        padding: 3px;
+        flex-shrink: 0;
+    }
+    
+    .parts-boxes {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+    
+    .part-box {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .part-box img {
+        max-width: 50px;
+        max-height: 50px;
+    }
+    
+    .part-box .question-mark {
+        font-size: 20px;
+    }
+    
+    .canvas-container {
+        padding: 10px;
+    }
+    
+    #gameCanvas {
+        width: 300px;
+        height: 424px;
+    }
+    
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    .game-info p {
+        font-size: 1em;
+    }
+    
+    .parts-side {
+        width: 60px;
+        max-width: 60px;
+        padding: 3px;
+        flex-shrink: 0;
+    }
+    
+    .part-box {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .part-box img {
+        max-width: 35px;
+        max-height: 35px;
+    }
+    
+    .part-box .question-mark {
+        font-size: 16px;
+    }
+    
+    #gameCanvas {
+        width: 250px;
+        height: 353px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+    
+    
+    .game-status p {
+        font-size: 1em;
+    }
+}

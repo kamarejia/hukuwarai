@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>福笑いモ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>福笑いモ</h1>
+            <div class="game-info">
+                <p>パーツをドラッグ&ドロップで配置しよう！</p>
+            </div>
+            <div class="game-status" id="gameStatus">
+                <p>ゲームを開始します</p>
+            </div>
+        </header>
+
+        <main class="game-container">
+            <aside class="parts-side left-side">
+                <div class="parts-boxes" id="leftPartsBoxes">
+                    <!-- 左側6個のパーツボックス -->
+                </div>
+            </aside>
+
+            <section class="game-area">
+                <div class="canvas-container">
+                    <canvas id="gameCanvas" width="400" height="565"></canvas>
+                </div>
+                <div class="controls">
+                    <button id="resetBtn" class="btn">リセット</button>
+                </div>
+            </section>
+
+            <aside class="parts-side right-side">
+                <div class="parts-boxes" id="rightPartsBoxes">
+                    <!-- 右側7個のパーツボックス -->
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="js/game.js"></script>
+</body>
+</html>

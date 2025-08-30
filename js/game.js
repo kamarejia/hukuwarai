@@ -512,8 +512,16 @@ class LemonFukuwarai {
     showTitleModal() {
         this.titleModal.classList.add('show');
         this.titleInput.value = '';
-        this.titleInput.focus();
         this.savedTitle.style.display = 'none';
+        
+        // モバイルでのフォーカス処理を改善
+        setTimeout(() => {
+            this.titleInput.focus();
+            // iOS Safariでのフォーカス問題対応
+            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                this.titleInput.click();
+            }
+        }, 100);
     }
     
     hideTitleModal() {

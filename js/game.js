@@ -210,13 +210,20 @@ class LemonFukuwarai {
     }
 
     handleBoxTouchStart(e, box, part) {
+        if (!this.isGameActive || !box.classList.contains('revealed') || box.classList.contains('used')) {
+            return;
+        }
+        
         e.preventDefault();
         const touch = e.touches[0];
-        const mouseEvent = new MouseEvent('mousedown', {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
-        this.handleBoxMouseDown(mouseEvent, box, part);
+        
+        this.isDragging = true;
+        this.currentDragBox = { box, part };
+        this.dragStartPos = { x: touch.clientX, y: touch.clientY };
+        
+        // タッチフィードバック
+        box.style.transform = 'scale(0.95)';
+        navigator.vibrate && navigator.vibrate(50);
     }
 
     handleMouseMove(e) {
@@ -252,23 +259,42 @@ class LemonFukuwarai {
     // タッチイベントハンドラー（パーツボックス用は handleBoxTouchStart で処理済み）
 
     handleTouchMove(e) {
+        if (!this.isDragging || !this.currentDragBox) return;
+        
         e.preventDefault();
         const touch = e.touches[0];
-        const mouseEvent = new MouseEvent('mousemove', {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
-        this.handleMouseMove(mouseEvent);
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        
+        this.redrawWithDraggedPart(x, y);
     }
 
     handleTouchEnd(e) {
+        if (!this.isDragging || !this.currentDragBox) return;
+        
         e.preventDefault();
         const touch = e.changedTouches[0];
-        const mouseEvent = new MouseEvent('mouseup', {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
-        this.handleMouseUp(mouseEvent);
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        
+        // ボックスの変形をリセット
+        if (this.currentDragBox.box) {
+            this.currentDragBox.box.style.transform = '';
+        }
+        
+        // キャンバス内でドロップされた場合のみ配置
+        if (x >= 0 && x <= this.canvas.width && y >= 0 && y <= this.canvas.height) {
+            this.placePart(x, y);
+        } else {
+            this.clearCanvas();
+        }
+        
+        this.isDragging = false;
+        this.currentDragBox = null;
     }
 
 

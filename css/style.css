@@ -140,6 +140,10 @@ h1::after {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
 .part-box.revealed {
@@ -203,6 +207,7 @@ h1::after {
     border-radius: 15px;
     cursor: crosshair;
     background: rgba(248, 250, 252, 0.6);
+    touch-action: none;
 }
 
 
@@ -294,13 +299,14 @@ h1::after {
     }
     
     .part-box {
-        width: 60px;
-        height: 60px;
+        width: 75px;
+        height: 75px;
+        border-width: 2px;
     }
     
     .part-box img {
-        max-width: 50px;
-        max-height: 50px;
+        max-width: 65px;
+        max-height: 65px;
     }
     
     .part-box .question-mark {

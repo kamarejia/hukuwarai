@@ -127,7 +127,7 @@ class LemonFukuwarai {
         
         this.showStatus('ゲームを開始します...');
         
-        // ランダム順序を生成
+        // head、body、残りパーツの順序を生成
         this.generateRandomOrder();
         
         // パーツボックスを作成
@@ -138,11 +138,21 @@ class LemonFukuwarai {
     }
     
     generateRandomOrder() {
-        this.randomOrder = [...this.parts];
-        for (let i = this.randomOrder.length - 1; i > 0; i--) {
+        // 1番目：head、2番目：body、3番目以降：ランダム
+        const headPart = this.parts.find(part => part.name === 'head');
+        const bodyPart = this.parts.find(part => part.name === 'body');
+        const otherParts = this.parts.filter(part => 
+            part.name !== 'head' && part.name !== 'body'
+        );
+        
+        // 残りのパーツをシャッフル
+        for (let i = otherParts.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [this.randomOrder[i], this.randomOrder[j]] = [this.randomOrder[j], this.randomOrder[i]];
+            [otherParts[i], otherParts[j]] = [otherParts[j], otherParts[i]];
         }
+        
+        // 順序を設定：head → body → ランダムな残りパーツ
+        this.randomOrder = [headPart, bodyPart, ...otherParts];
     }
     
     createPartsBoxes() {
@@ -210,28 +220,28 @@ class LemonFukuwarai {
     }
 
     handleBoxTouchStart(e, box, part) {
-        if (!this.isGameActive || !box.classList.contains('revealed') || box.classList.contains('used')) {
-            return;
-        }
-        
         e.preventDefault();
         const touch = e.touches[0];
-        
-        this.isDragging = true;
-        this.currentDragBox = { box, part };
-        this.dragStartPos = { x: touch.clientX, y: touch.clientY };
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        this.handleBoxMouseDown(mouseEvent, box, part);
         
         // タッチフィードバック
         box.style.transform = 'scale(0.95)';
-        navigator.vibrate && navigator.vibrate(50);
     }
 
     handleMouseMove(e) {
         if (!this.isDragging || !this.currentDragBox) return;
         
         const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        // キャンバスの実際のサイズとCSSサイズの違いを考慮
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
         
         this.redrawWithDraggedPart(x, y);
     }
@@ -240,8 +250,12 @@ class LemonFukuwarai {
         if (!this.isDragging || !this.currentDragBox) return;
         
         const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        // キャンバスの実際のサイズとCSSサイズの違いを考慮
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
         
         // キャンバス内でドロップされた場合のみ配置
         if (x >= 0 && x <= this.canvas.width && y >= 0 && y <= this.canvas.height) {
@@ -259,42 +273,28 @@ class LemonFukuwarai {
     // タッチイベントハンドラー（パーツボックス用は handleBoxTouchStart で処理済み）
 
     handleTouchMove(e) {
-        if (!this.isDragging || !this.currentDragBox) return;
-        
         e.preventDefault();
         const touch = e.touches[0];
-        
-        const rect = this.canvas.getBoundingClientRect();
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
-        
-        this.redrawWithDraggedPart(x, y);
+        const mouseEvent = new MouseEvent('mousemove', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        this.handleMouseMove(mouseEvent);
     }
 
     handleTouchEnd(e) {
-        if (!this.isDragging || !this.currentDragBox) return;
-        
         e.preventDefault();
         const touch = e.changedTouches[0];
+        const mouseEvent = new MouseEvent('mouseup', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        this.handleMouseUp(mouseEvent);
         
-        const rect = this.canvas.getBoundingClientRect();
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
-        
-        // ボックスの変形をリセット
-        if (this.currentDragBox.box) {
+        // タッチ特有のリセット
+        if (this.currentDragBox && this.currentDragBox.box) {
             this.currentDragBox.box.style.transform = '';
         }
-        
-        // キャンバス内でドロップされた場合のみ配置
-        if (x >= 0 && x <= this.canvas.width && y >= 0 && y <= this.canvas.height) {
-            this.placePart(x, y);
-        } else {
-            this.clearCanvas();
-        }
-        
-        this.isDragging = false;
-        this.currentDragBox = null;
     }
 
 

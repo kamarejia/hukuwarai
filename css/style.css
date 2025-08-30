@@ -231,6 +231,9 @@ h1::after {
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.2);
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn:hover:not(:disabled) {
@@ -322,6 +325,27 @@ h1::after {
         height: 424px;
     }
     
+}
+
+/* ドラッグ追跡要素（スマホ用） */
+.drag-follower {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.1s;
+    transform-origin: center center;
+    will-change: transform, left, top;
+}
+
+.drag-follower.active {
+    opacity: 1;
+    transition: opacity 0.1s;
+}
+
+.drag-follower img {
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    pointer-events: none;
 }
 
 @media (max-width: 480px) {

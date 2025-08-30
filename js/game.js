@@ -9,6 +9,7 @@ class LemonFukuwarai {
         this.revealedBoxIndex = 0; // 現在公開されているボックスのインデックス
         this.randomOrder = []; // ゲーム毎のランダム順序
         this.currentDragBox = null; // 現在ドラッグ中のボックス
+        this.dragFollower = null; // ドラッグ追跡要素
         
         // 元画像のサイズとスケール設定
         this.originalImageSize = { width: 608, height: 859 };
@@ -63,6 +64,7 @@ class LemonFukuwarai {
     }
 
     async init() {
+        this.dragFollower = document.getElementById('dragFollower');
         await this.loadImages();
         this.setupEventListeners();
         
@@ -106,7 +108,12 @@ class LemonFukuwarai {
     }
 
     setupEventListeners() {
-        document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
+        const resetBtn = document.getElementById('resetBtn');
+        resetBtn.addEventListener('click', () => this.resetGame());
+        resetBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.resetGame();
+        });
         
         // キャンバスでのドラッグ継続・終了
         this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
@@ -114,9 +121,10 @@ class LemonFukuwarai {
         this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e));
         this.canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e));
         
-        // 全体でのマウス離す処理
+        // 全体でのマウス離す処理とタッチムーブ処理
         document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
         document.addEventListener('touchend', (e) => this.handleTouchEnd(e));
+        document.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
     }
 
     startGame() {
@@ -230,6 +238,9 @@ class LemonFukuwarai {
         
         // タッチフィードバック
         box.style.transform = 'scale(0.95)';
+        
+        // ドラッグ追跡要素を表示
+        this.showDragFollower(touch.clientX, touch.clientY);
     }
 
     handleMouseMove(e) {
@@ -274,16 +285,28 @@ class LemonFukuwarai {
 
     handleTouchMove(e) {
         e.preventDefault();
+        e.stopPropagation();
+        
+        if (!this.isDragging || !this.currentDragBox) return;
+        
         const touch = e.touches[0];
-        const mouseEvent = new MouseEvent('mousemove', {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
-        this.handleMouseMove(mouseEvent);
+        if (!touch) return;
+        
+        // ドラッグ追跡要素のみを更新（キャンバス描画は無効化）
+        this.showDragFollower(touch.clientX, touch.clientY);
     }
 
     handleTouchEnd(e) {
         e.preventDefault();
+        e.stopPropagation();
+        
+        // ドラッグ追跡要素を隠す
+        this.hideDragFollower();
+        
+        // 描画状態をクリア
+        this.pendingDrawPos = null;
+        this.drawPending = false;
+        
         const touch = e.changedTouches[0];
         const mouseEvent = new MouseEvent('mouseup', {
             clientX: touch.clientX,
@@ -305,8 +328,47 @@ class LemonFukuwarai {
         const img = this.images[part.name];
         if (!img) return;
         
+        // PC用のキャンバス描画
         this.clearCanvas();
         this.drawScaledImage(img, x, y);
+    }
+    
+    showDragFollower(clientX, clientY) {
+        if (!this.dragFollower || !this.currentDragBox) return;
+        
+        const part = this.currentDragBox.part;
+        const img = this.images[part.name];
+        if (!img) return;
+        
+        // ドラッグ時は操作しやすい小さめのサイズ（キャンバスサイズの60%）
+        const baseScaledWidth = img.width * this.canvasScale;
+        const baseScaledHeight = img.height * this.canvasScale;
+        const scaledWidth = baseScaledWidth * 0.6;
+        const scaledHeight = baseScaledHeight * 0.6;
+        
+        // 画像設定を一度だけ行う（ドラッグ開始時）
+        if (!this.dragFollower.classList.contains('active')) {
+            this.dragFollower.innerHTML = `
+                <img src="レモふくわらい/${part.file}" 
+                     alt="${part.displayName}" 
+                     style="width: ${scaledWidth}px; height: ${scaledHeight}px;">
+            `;
+            this.dragFollower.classList.add('active');
+            this.dragFollower.style.left = '0px';
+            this.dragFollower.style.top = '0px';
+        }
+        
+        // 画像の中心を指の位置に合わせる
+        const offsetX = scaledWidth / 2;
+        const offsetY = scaledHeight / 2;
+        this.dragFollower.style.transform = `translate(${clientX - offsetX}px, ${clientY - offsetY}px)`;
+    }
+    
+    hideDragFollower() {
+        if (!this.dragFollower) return;
+        this.dragFollower.classList.remove('active');
+        this.dragFollower.innerHTML = '';
+        this.dragFollower.style.transform = '';
     }
 
     async placePart(x, y) {

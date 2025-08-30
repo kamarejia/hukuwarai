@@ -191,23 +191,93 @@ h1::after {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 0;
 }
 
 .canvas-container {
     position: relative;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 20px;
-    padding: 15px;
-    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
-    border: 3px solid #3b82f6;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+    margin-bottom: 8px;
+}
+
+/* 完成時の額装スタイル */
+.canvas-container.completed {
+    background: linear-gradient(135deg, #92400e, #b45309);
+    border: 8px solid #451a03;
+    box-shadow: 
+        0 0 0 2px #d97706,
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 0 15px rgba(0, 0, 0, 0.3);
+    padding: 25px;
+}
+
+.canvas-container.completed::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    border: 2px solid #fbbf24;
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.canvas-container.completed #gameCanvas {
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 #gameCanvas {
-    border-radius: 15px;
+    border-radius: 4px;
     cursor: crosshair;
-    background: rgba(248, 250, 252, 0.6);
+    background: rgba(248, 250, 252, 0.95);
     touch-action: none;
+    border: 4px solid #3b82f6;
+}
+
+/* 作品名表示 - 絵画キャプション風 */
+.artwork-title {
+    margin: 2px 0 40px 0;
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.6s ease;
+}
+
+.artwork-title.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.title-frame {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #e5e5e5;
+    border-radius: 2px;
+    padding: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title-plate {
+    background: white;
+    padding: 8px 16px;
+    border-radius: 1px;
+}
+
+#canvasTitleText {
+    font-family: 'Times New Roman', serif;
+    font-size: 1.1em;
+    font-weight: normal;
+    color: #333333;
+    text-align: center;
+    margin: 0;
+    font-style: italic;
 }
 
 
@@ -348,6 +418,129 @@ h1::after {
     pointer-events: none;
 }
 
+/* 題名入力モーダル */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.modal-content h2 {
+    color: #1e40af;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+.modal-content p {
+    color: #475569;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+.title-input-group {
+    margin-bottom: 20px;
+}
+
+#titleInput {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-family: 'Kosugi Maru', cursive;
+    text-align: center;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+}
+
+#titleInput:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.title-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #4b5563, #374151);
+}
+
+/* 目ボタンのスタイル */
+#togglePartsBtn {
+    font-size: 1.2em;
+    padding: 10px 15px;
+    min-width: 50px;
+    transition: all 0.3s ease;
+}
+
+#togglePartsBtn.parts-hidden {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+#togglePartsBtn.parts-hidden:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* パーツボックス非表示状態 */
+.parts-side.hidden {
+    display: none;
+}
+
+.saved-title {
+    background: linear-gradient(135deg, #fef3c7, #fbbf24);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.saved-title h3 {
+    margin: 0;
+    color: #92400e;
+    font-size: 1.2em;
+}
+
 @media (max-width: 480px) {
     .header {
         padding: 15px;
@@ -394,6 +587,24 @@ h1::after {
     
     
     .game-status p {
+        font-size: 1em;
+    }
+    
+    /* スマホでの作品名表示調整 */
+    .canvas-container {
+        padding: 0;
+        margin-bottom: 6px;
+    }
+    
+    .artwork-title {
+        margin: 2px 0 30px 0;
+    }
+    
+    .title-plate {
+        padding: 6px 12px;
+    }
+    
+    #canvasTitleText {
         font-size: 1em;
     }
 }

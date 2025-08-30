@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>福笑いモ</title>
+    <title>福笑モ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
@@ -15,9 +15,9 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>福笑いモ</h1>
+            <h1>福笑モ</h1>
             <div class="game-info">
-                <p>パーツをドラッグ&ドロップで配置しよう！</p>
+                <p>パーツをドラッグ&ドロップで笑モいレモを描こう！</p>
             </div>
             <div class="game-status" id="gameStatus">
                 <p>ゲームを開始します</p>
@@ -35,8 +35,16 @@
                 <div class="canvas-container">
                     <canvas id="gameCanvas" width="400" height="565"></canvas>
                 </div>
+                <div id="artworkTitle" class="artwork-title" style="display: none;">
+                    <div class="title-frame">
+                        <div class="title-plate">
+                            <h2 id="canvasTitleText">作品名</h2>
+                        </div>
+                    </div>
+                </div>
                 <div class="controls">
                     <button id="resetBtn" class="btn">リセット</button>
+                    <button id="togglePartsBtn" class="btn btn-secondary" style="display: none;">👁️</button>
                 </div>
             </section>
 
@@ -50,6 +58,24 @@
 
     <!-- スマホ用ドラッグ追跡要素 -->
     <div id="dragFollower" class="drag-follower"></div>
+
+    <!-- 題名入力モーダル -->
+    <div id="titleModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 完成！</h2>
+            <p>あなたの作品に題名をつけてください</p>
+            <div class="title-input-group">
+                <input type="text" id="titleInput" placeholder="作品の題名を入力..." maxlength="30">
+                <div class="title-buttons">
+                    <button id="saveTitleBtn" class="btn btn-primary">保存</button>
+                    <button id="skipTitleBtn" class="btn btn-secondary">スキップ</button>
+                </div>
+            </div>
+            <div id="savedTitle" class="saved-title" style="display: none;">
+                <h3>📝 作品名：<span id="displayTitle"></span></h3>
+            </div>
+        </div>
+    </div>
 
     <script src="js/game.js?v=20250831"></script>
 </body>

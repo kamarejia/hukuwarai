@@ -10,6 +10,8 @@ class LemonFukuwarai {
         this.randomOrder = []; // ゲーム毎のランダム順序
         this.currentDragBox = null; // 現在ドラッグ中のボックス
         this.dragFollower = null; // ドラッグ追跡要素
+        this.currentTitle = ''; // 作品の題名
+        this.partsVisible = true; // パーツボックス表示状態
         
         // 元画像のサイズとスケール設定
         this.originalImageSize = { width: 608, height: 859 };
@@ -19,17 +21,17 @@ class LemonFukuwarai {
         this.parts = [
             { name: 'body', file: 'body.png', displayName: '体' },
             { name: 'head', file: 'head.png', displayName: '頭' },
-            { name: 'l_leg', file: 'l_leg.png', displayName: '左足' },
-            { name: 'r_leg', file: 'r_leg.png', displayName: '右足' },
-            { name: 'l_hand', file: 'l_hand.png', displayName: '左手' },
-            { name: 'r_hand', file: 'r_hand.png', displayName: '右手' },
+            { name: 'l_leg', file: 'l_leg.png', displayName: '右足' },
+            { name: 'r_leg', file: 'r_leg.png', displayName: '左足' },
+            { name: 'l_hand', file: 'l_hand.png', displayName: '右手' },
+            { name: 'r_hand', file: 'r_hand.png', displayName: '左手' },
             { name: 'head_top', file: 'head_top.png', displayName: '頭の上' },
             { name: 'antenna', file: 'antenna.png', displayName: 'アンテナ' },
             { name: 'antenna_ball', file: 'antenna_ball.png', displayName: 'アンテナボール' },
             { name: 'mouth_lower', file: 'mouth_lower.png', displayName: '下唇' },
             { name: 'mouth_upper', file: 'mouth_upper.png', displayName: '上唇' },
-            { name: 'l_eye', file: 'l_eye.png', displayName: '左目' },
-            { name: 'r_eye', file: 'r_eye.png', displayName: '右目' }
+            { name: 'l_eye', file: 'l_eye.png', displayName: '右目' },
+            { name: 'r_eye', file: 'r_eye.png', displayName: '左目' }
         ];
         
         // レイヤー順序（描画順序 - 下から上へ）
@@ -65,6 +67,8 @@ class LemonFukuwarai {
 
     async init() {
         this.dragFollower = document.getElementById('dragFollower');
+        this.togglePartsBtn = document.getElementById('togglePartsBtn');
+        this.setupTitleModal();
         await this.loadImages();
         this.setupEventListeners();
         
@@ -120,6 +124,13 @@ class LemonFukuwarai {
         resetBtn.addEventListener('touchend', (e) => {
             e.preventDefault();
             this.resetGame();
+        });
+        
+        // 目ボタンのイベントリスナー
+        this.togglePartsBtn.addEventListener('click', () => this.togglePartsVisibility());
+        this.togglePartsBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.togglePartsVisibility();
         });
         
         // キャンバスでのドラッグ継続・終了
@@ -461,7 +472,144 @@ class LemonFukuwarai {
             }
         }
         
+        // 題名入力モーダルを表示
+        this.showTitleModal();
+    }
+    
+    setupTitleModal() {
+        this.titleModal = document.getElementById('titleModal');
+        this.titleInput = document.getElementById('titleInput');
+        this.saveTitleBtn = document.getElementById('saveTitleBtn');
+        this.skipTitleBtn = document.getElementById('skipTitleBtn');
+        this.savedTitle = document.getElementById('savedTitle');
+        this.displayTitle = document.getElementById('displayTitle');
+        this.artworkTitle = document.getElementById('artworkTitle');
+        this.canvasTitleText = document.getElementById('canvasTitleText');
+        
+        // イベントリスナー
+        this.saveTitleBtn.addEventListener('click', () => this.saveTitle());
+        this.skipTitleBtn.addEventListener('click', () => this.skipTitle());
+        
+        // Enterキーで保存
+        this.titleInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.saveTitle();
+            }
+        });
+        
+        // タッチ対応
+        this.saveTitleBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.saveTitle();
+        });
+        
+        this.skipTitleBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.skipTitle();
+        });
+    }
+    
+    showTitleModal() {
+        this.titleModal.classList.add('show');
+        this.titleInput.value = '';
+        this.titleInput.focus();
+        this.savedTitle.style.display = 'none';
+    }
+    
+    hideTitleModal() {
+        this.titleModal.classList.remove('show');
+    }
+    
+    saveTitle() {
+        const title = this.titleInput.value.trim();
+        if (title) {
+            this.currentTitle = title;
+            this.displayTitle.textContent = title;
+            this.savedTitle.style.display = 'block';
+            this.showStatus(`完成！「${title}」ができました！`);
+            
+            // キャンバス下に作品名を表示
+            this.showArtworkTitle(title);
+        } else {
+            this.skipTitle();
+        }
+        
+        setTimeout(() => {
+            this.hideTitleModal();
+        }, 2000);
+    }
+    
+    skipTitle() {
+        this.currentTitle = 'レモの福笑い';
         this.showStatus('完成！レモの福笑いができました！');
+        
+        // デフォルトタイトルを表示
+        this.showArtworkTitle(this.currentTitle);
+        this.hideTitleModal();
+    }
+    
+    showArtworkTitle(title) {
+        this.canvasTitleText.textContent = title;
+        this.artworkTitle.style.display = 'flex';
+        
+        // キャンバスコンテナに額装スタイルを適用
+        const canvasContainer = document.querySelector('.canvas-container');
+        canvasContainer.classList.add('completed');
+        
+        // 目ボタンを表示
+        this.togglePartsBtn.style.display = 'inline-block';
+        this.updateToggleButtonIcon();
+        
+        // 少し遅延させてアニメーション効果
+        setTimeout(() => {
+            this.artworkTitle.classList.add('show');
+        }, 500);
+    }
+    
+    hideArtworkTitle() {
+        this.artworkTitle.classList.remove('show');
+        
+        // 額装スタイルも削除
+        const canvasContainer = document.querySelector('.canvas-container');
+        canvasContainer.classList.remove('completed');
+        
+        // 目ボタンを非表示にし、パーツボックスを表示状態に戻す
+        this.togglePartsBtn.style.display = 'none';
+        this.partsVisible = true;
+        const leftSide = document.querySelector('.parts-side.left-side');
+        const rightSide = document.querySelector('.parts-side.right-side');
+        leftSide.classList.remove('hidden');
+        rightSide.classList.remove('hidden');
+        
+        setTimeout(() => {
+            this.artworkTitle.style.display = 'none';
+        }, 800);
+    }
+
+    togglePartsVisibility() {
+        this.partsVisible = !this.partsVisible;
+        const leftSide = document.querySelector('.parts-side.left-side');
+        const rightSide = document.querySelector('.parts-side.right-side');
+        
+        if (this.partsVisible) {
+            leftSide.classList.remove('hidden');
+            rightSide.classList.remove('hidden');
+        } else {
+            leftSide.classList.add('hidden');
+            rightSide.classList.add('hidden');
+        }
+        
+        this.updateToggleButtonIcon();
+    }
+    
+    updateToggleButtonIcon() {
+        if (this.partsVisible) {
+            this.togglePartsBtn.textContent = '👁️';
+            this.togglePartsBtn.classList.remove('parts-hidden');
+        } else {
+            this.togglePartsBtn.textContent = '👁️‍🗨️';
+            this.togglePartsBtn.classList.add('parts-hidden');
+        }
     }
 
     sleep(ms) {
@@ -475,6 +623,17 @@ class LemonFukuwarai {
         this.placedPositions = [];
         this.currentDragBox = null;
         this.randomOrder = [];
+        this.currentTitle = '';
+        
+        // モーダルを隠す
+        if (this.titleModal) {
+            this.hideTitleModal();
+        }
+        
+        // 作品名表示を隠す
+        if (this.artworkTitle) {
+            this.hideArtworkTitle();
+        }
         
         this.clearCanvas();
         this.showStatus('新しいゲームを開始します...');

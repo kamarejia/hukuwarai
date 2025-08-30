@@ -69,6 +69,14 @@ class LemonFukuwarai {
         this.dragFollower = document.getElementById('dragFollower');
         this.togglePartsBtn = document.getElementById('togglePartsBtn');
         this.setupTitleModal();
+        
+        // モーダルを確実に非表示にする
+        const modal = document.getElementById('titleModal');
+        if (modal) {
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+        }
+        
         await this.loadImages();
         this.setupEventListeners();
         
@@ -510,6 +518,7 @@ class LemonFukuwarai {
     }
     
     showTitleModal() {
+        this.titleModal.style.display = 'flex';
         this.titleModal.classList.add('show');
         this.titleInput.value = '';
         this.savedTitle.style.display = 'none';
@@ -526,6 +535,9 @@ class LemonFukuwarai {
     
     hideTitleModal() {
         this.titleModal.classList.remove('show');
+        setTimeout(() => {
+            this.titleModal.style.display = 'none';
+        }, 300);
     }
     
     saveTitle() {
